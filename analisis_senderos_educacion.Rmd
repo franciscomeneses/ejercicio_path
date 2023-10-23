@@ -10,11 +10,24 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## R Markdown
+
+## Cargar paquetes 
+
+```{r}
+# Instalar pacman si no está instalado
+if (!requireNamespace("pacman", quietly = TRUE)) {
+  install.packages("pacman")
+}
+
+# Cargar el paquete dplyr utilizando pacman::p_load
+pacman::p_load(dplyr,haven, readxl,lavaan,semPlot)
+```
+
+
+## Cargar datos
 
 
 ```{r}
-library(readxl)
 muestra_2018_educacion <- read_excel("input/muestra_2018_educacion.xlsx")
 
 ```
@@ -29,19 +42,20 @@ muestra_2018_educacion=muestra_2018_educacion %>% na.omit()
 ## Analisis path
 
 ```{r}
-library(lavaan)
+
 
 model <- '  ptje_lect2m_alu ~ ingreso_percapita '
 
 fit <- lavaan::sem(model, data = muestra_2018_educacion) #calcular 
 summary(fit, standardized = TRUE, fit.measures = TRUE) 
 
-library(semPlot)
-semPaths(fit, 'std', layout = 'circle')
 
+semPaths(fit,   whatLabels = "std",
+           sizeMan = 15,
+           edge.label.cex = 1.15,
+           style = "ram",
+           nCharNodes = 0, nCharEdges = 0)
 
-
-library(lavaan)
 
 model <- '  ptje_lect2m_alu ~ ptje_lect2m_alu_colegio + apoyo_escolar 
 ptje_lect2m_alu_colegio ~ ingreso_percapita
@@ -50,12 +64,12 @@ apoyo_escolar ~ ingreso_percapita
 
 '
 
-fit <- lavaan::sem(model, data = muestra_2018_educacion) #calcular 
-summary(fit, standardized = TRUE, fit.measures = TRUE, rsquare=T) 
+fit2 <- lavaan::sem(model, data = muestra_2018_educacion) #calcular 
+summary(fit2, standardized = TRUE, fit.measures = TRUE, rsquare=T) 
 
 
 
-semPaths(fit, whatLabels = "std",
+semPaths(fit2, whatLabels = "std",
            sizeMan = 15,
            edge.label.cex = 1.15,
            style = "ram",
